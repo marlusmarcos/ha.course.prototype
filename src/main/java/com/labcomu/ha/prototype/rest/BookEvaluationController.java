@@ -46,7 +46,7 @@ public class BookEvaluationController {
 		}
 		else {
 			
-			bookScore = new BookScore();
+			bookScore = BookScore.EMPTY;
 		}
 
 		

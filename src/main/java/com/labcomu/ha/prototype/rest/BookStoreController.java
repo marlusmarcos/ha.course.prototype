@@ -45,14 +45,16 @@ public class BookStoreController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Book> findBook(@PathVariable int id, @RequestParam(name = "cb") boolean cbEnabled) {
+	public ResponseEntity<Book> findBook(@PathVariable int id, @RequestParam(name = "cb", required = false) Boolean cbEnabled) {
 
 		ResponseEntity<Book> response;
+		
+		boolean useCircuitBreaker = (cbEnabled !=null? cbEnabled.booleanValue():false);
 		try {
 
-			Book book = getBook(id, cbEnabled);
-
-			response = new ResponseEntity<Book>(book, HttpStatus.OK);
+			response = getBookResponse(id, useCircuitBreaker);
+	
+			
 		} catch (Exception e) {
 			response = new ResponseEntity<Book>(HttpStatus.SERVICE_UNAVAILABLE);
 			logger.info("Response ("+id+") SERVICE_UNAVAILABLE ["+e.getMessage()+"]");
@@ -63,10 +65,12 @@ public class BookStoreController {
 		return response;
 	}
 
-	private Book getBook(int id, boolean cbEnabled) {
+	private ResponseEntity<Book> getBookResponse(int id, boolean cbEnabled) {
 		int index = 0;
 		Book book;
-		
+		ResponseEntity<Book> response;
+		HttpStatus status = HttpStatus.OK;
+
 		logger.info("Calling GetBook endpoint by id="+id);
 		
 		
@@ -78,21 +82,31 @@ public class BookStoreController {
 			
 			if(cbEnabled) {
 				bookScore = bookScoreGateway.getBookScoreCB(id);
+				
+				if(bookScore.equals(BookScore.EMPTY)) {
+					status = HttpStatus.PARTIAL_CONTENT;
+				}
 			}
 			else {
 				bookScore = bookScoreGateway.getBookScore(id);
+
 			}
+			
 			book.setScore(bookScore);
 		}
 		else {
 			
 			book = Book.NULLABLE_BOOK;
+			status = HttpStatus.NO_CONTENT;
 		}
 		
 		
+		response = new ResponseEntity<Book>(book, status);
+
 
 		logger.info("Returning Book="+book);
-		return book;
+		logger.info("Status Response="+status);
+		return response;
 	}
 
 

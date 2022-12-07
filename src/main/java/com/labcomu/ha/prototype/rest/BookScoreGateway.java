@@ -135,7 +135,7 @@ public class BookScoreGateway {
 
 		logger.info("Fallback GetBookStore ("+id+") ["+e.getMessage()+"] ");
 
-		return BookScore.NULLABLE_BOOKSCORE;
+		return BookScore.EMPTY;
 	}
 
 	public static synchronized BookScoreGateway getInstance() {
