@@ -9,9 +9,9 @@
 	</parent>
 
 	<groupId>com.labcomu</groupId>
-	<artifactId>ha.prototype</artifactId>
+	<artifactId>ha.course.prototype</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ha.prototype</name>
+	<name>ha.course.prototype</name>
 	<description>Demo project for test</description>
 
 	<properties>
